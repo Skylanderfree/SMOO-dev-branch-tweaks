@@ -196,11 +196,8 @@ void drawMainHook(HakoniwaSequence* curSequence, sead::Viewport* viewport, sead:
                     Client::getMaxPlayerCount(),
                     Client::getMaxPlayerCount() < 10 ? "-" : ""
                 );
-
-                // Hide sensitive player information while an in a gamemode
-                GameMode currentMode = GameModeManager::instance()->getGameMode();
-                bool hideGameModeInfo = GameModeManager::instance()->isActive() &&
-                (currentMode == GameMode::HIDEANDSEEK || currentMode == GameMode::SARDINE || currentMode == GameMode::FREEZETAG);
+                // Hide sensitive player information while in a gamemode
+                const bool hideGameModeInfo = GameModeManager::instance()->isActive();
 
                 if (debugPuppetIndex == 0) {
                     gTextWriter->printf("Player Name: %s\n",       Client::getClientName());
