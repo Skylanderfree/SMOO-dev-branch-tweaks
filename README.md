@@ -4,7 +4,7 @@
 - Adds captain's hat
 
 ## TODO
-- Fix Freeze tag keyboard crashing
+- Fix captain's hat double hair on certain mario models
 - Making the `dev` branch stable
 
 ### V V everything at bottom is completely unchanged V V
