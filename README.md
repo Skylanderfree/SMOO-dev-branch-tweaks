@@ -7,7 +7,7 @@
 - Fix Freeze tag keyboard crashing
 - Making the `dev` branch stable
 
-### VV everything at bottom is completely unchanged VV
+### V V everything at bottom is completely unchanged V V
 
 # Super Mario Odyssey - Online Multiplayer Mod
 
