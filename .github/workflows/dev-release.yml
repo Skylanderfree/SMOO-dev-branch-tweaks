@@ -8,6 +8,8 @@ on:
     branches:
     - 'dev'
 
+permissions:
+  contents: write
 
 env:
   TAG : 'latest-dev'
