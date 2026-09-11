@@ -13,4 +13,4 @@ RUN pip3 install keystone-engine
 
 WORKDIR  /app/
 
-ENTRYPOINT  [ "make" ]
+ENTRYPOINT  make
