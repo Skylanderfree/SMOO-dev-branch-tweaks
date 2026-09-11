@@ -1,10 +1,12 @@
+# CHECK OUT THE `DEV` BRANCH NOT `MAIN`
+
 # This fork adds the following features to the `dev` branch
 - No poof particles
 - Hide important things in debug menu when in gamemode
 - Adds captain's hat
 
 ## TODO
-- Fix Freeze tag keyboard crashing
+- Fix captain's hat double hair on certain mario models
 - Making the `dev` branch stable
 
 ### V V everything at bottom is completely unchanged V V
