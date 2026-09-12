@@ -26,7 +26,6 @@ float vecDistanceSq(sead::Vector3f const& a, sead::Vector3f const& b);
 float quatAngle(sead::Quatf const& q1, sead::Quatf& q2);
 
 bool isInCostumeList(const char* costumeName);
-bool isNoBodyHairCostume(const char* costumeName);
 
 const char* tryGetPuppetCapName(PuppetInfo* info);
 const char* tryGetPuppetBodyName(PuppetInfo* info);

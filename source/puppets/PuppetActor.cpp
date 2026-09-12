@@ -549,7 +549,7 @@ PlayerCostumeInfo* initMarioModelPuppet(
     PlayerCostumeInfo* costumeInfo = new PlayerCostumeInfo();
     costumeInfo->init(bodyInfo, headInfo);
 
-    if (costumeInfo->isNeedBodyHair() && !isNoBodyHairCostume(bodyName)) {
+    if (costumeInfo->isNeedBodyHair()) {
 
 
         Logger::log("Creating Body Hair Parts Model.\n");
