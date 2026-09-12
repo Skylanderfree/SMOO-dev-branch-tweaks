@@ -84,11 +84,8 @@ void PuppetHolder::update() {
         if (curInfo->isInSameStage && al::isDead(curPuppet)) {
             curPuppet->makeActorAlive();
 
-            curPuppet->emitJoinEffect();
         } else if (!curInfo->isInSameStage && !al::isDead(curPuppet)) {
             curPuppet->makeActorDead();
-
-            curPuppet->emitJoinEffect();
         }
     }
 }
