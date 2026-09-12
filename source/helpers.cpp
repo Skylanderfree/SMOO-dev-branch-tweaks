@@ -102,6 +102,19 @@ bool isInCostumeList(const char* costumeName) {
     return false;
 }
 
+// Costumes that already contain their own hair/head hair.
+// Do not create the additional "髪" body-hair PartsModel for these.
+bool isNoBodyHairCostume(const char* costumeName) {
+    if (!costumeName) {
+        return false;
+    }
+
+    return al::isEqualString(costumeName, "Mario64")
+        || al::isEqualString(costumeName, "Mario64Metal")
+        || al::isEqualString(costumeName, "MarioColorGold")
+        || al::isEqualString(costumeName, "MarioBone");
+}
+
 const char* tryGetPuppetCapName(PuppetInfo* info) {
     if (info->costumeHead && isInCostumeList(info->costumeHead)) {
         return info->costumeHead;
