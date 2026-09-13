@@ -31,6 +31,34 @@ static const char* subActorNames[] = {
     "左手", // Left Hand
     "右手" // Right Hand
 };
+// These costumes have to ignore the CapHair
+// cap BFRES:
+//     CapHair__HairMT
+//     Hair__HairMT
+
+static bool isPuppetHairRemovalCostume(const char* costumeName) {
+    if (!costumeName) {
+        return false;
+    }
+    return al::isEqualString(costumeName, "Mario64") ||
+           al::isEqualString(costumeName, "Mario64Metal") ||
+           al::isEqualString(costumeName, "MarioBone") ||
+           al::isEqualString(costumeName, "MarioColorGold");
+}
+static void hidePuppetCostumeHair(al::LiveActor* curModel) {
+    if (!curModel) {
+        return;
+    }
+    al::LiveActor* headModel = al::tryGetSubActor(curModel, "頭");
+
+    if (headModel) {
+        PlayerFunction::hideHairVisibility(headModel);
+    }
+    al::LiveActor* hairModel = al::tryGetSubActor(curModel, "髪");
+    if (hairModel) {
+        hairModel->makeActorDead();
+    }
+}
 
 PuppetActor::PuppetActor(const char* name) : al::LiveActor(name) {
     mPuppetCap   = new PuppetCapActor(name);
@@ -84,8 +112,16 @@ void PuppetActor::init(al::ActorInitInfo const& initInfo) {
     // "[デモ用]キャップの目" = [Demo] Cap Eyes
 
     al::LiveActor* headModel = al::getSubActor(normalModel, "頭");
-    al::getSubActor(headModel, "キャップの目")->kill();
-    al::startVisAnimForAction(headModel, "CapOn");
+    if (headModel) {
+        al::LiveActor* capEyes = al::tryGetSubActor(headModel, "キャップの目");
+        if (capEyes) {
+            capEyes->kill();
+        }
+        al::startVisAnimForAction(headModel, "CapOn");
+    }
+    if (isPuppetHairRemovalCostume(mCostumeInfo->mHeadInfo->costumeName)) {
+        hidePuppetCostumeHair(normalModel);
+    }
 
     mModelHolder->changeModel("Normal");
 
@@ -204,8 +240,16 @@ void PuppetActor::control() {
 
             startAction(mInfo->curSubAnimStr);
 
-            al::LiveActor* headModel = al::getSubActor(curModel, "頭");
+            al::LiveActor* headModel = al::tryGetSubActor(curModel, "頭");
             if (headModel) { al::startVisAnimForAction(headModel, "CapOn"); }
+        }
+
+        // CapOn can change the visibility of Mario's Hair
+        if (isPuppetHairRemovalCostume(
+                mCostumeInfo->mHeadInfo->costumeName)) {
+            hidePuppetCostumeHair(curModel);
+        } else {
+            hairControl();
         }
 
         if (mNameTag) {
@@ -321,6 +365,9 @@ void PuppetActor::startAction(const char* actName) {
 void PuppetActor::hairControl() {
     al::LiveActor* curModel = getCurrentModel();
 
+    if (!curModel || !mCostumeInfo) {
+        return;
+    }
     if (mCostumeInfo->isNeedSyncBodyHair()) {
         PlayerFunction::syncBodyHairVisibility(al::getSubActor(curModel, "髪"), al::getSubActor(curModel, "頭"));
     }
@@ -330,8 +377,22 @@ void PuppetActor::hairControl() {
     if (mCostumeInfo->isSyncStrap()) {
         PlayerFunction::syncMarioHeadStrapVisibility(al::getSubActor(curModel, "頭"));
     }
-    if (PlayerFunction::isNeedHairControl(mCostumeInfo->mBodyInfo, mCostumeInfo->mHeadInfo->costumeName)) {
-        PlayerFunction::hideHairVisibility(al::getSubActor(curModel, "頭"));
+
+    const char* costumeName = mCostumeInfo->mHeadInfo->costumeName;
+
+    if (isPuppetHairRemovalCostume(costumeName)) {
+        hidePuppetCostumeHair(curModel);
+        return;
+    }
+
+    if (PlayerFunction::isNeedHairControl(
+            mCostumeInfo->mBodyInfo, costumeName))
+    {
+        al::LiveActor* head = al::tryGetSubActor(curModel, "頭");
+
+        if (head) {
+            PlayerFunction::hideHairVisibility(head);
+        }
     }
 }
 
@@ -358,6 +419,18 @@ void PuppetActor::changeModel(const char* newModel) {
     getCurrentModel()->makeActorDead();
     mModelHolder->changeModel(newModel);
     getCurrentModel()->makeActorAlive();
+
+    // Reapply costume-specific hair hiding whenever we
+    // switch between Normal / Normal2D / capture models.
+    if (
+        !mIsCaptureModel &&
+        mCostumeInfo &&
+        isPuppetHairRemovalCostume(
+            mCostumeInfo->mHeadInfo->costumeName
+        )
+    ) {
+        hidePuppetCostumeHair(getCurrentModel());
+    }
 }
 
 al::LiveActor* PuppetActor::getCurrentModel() {
@@ -550,8 +623,6 @@ PlayerCostumeInfo* initMarioModelPuppet(
     costumeInfo->init(bodyInfo, headInfo);
 
     if (costumeInfo->isNeedBodyHair()) {
-
-
         Logger::log("Creating Body Hair Parts Model.\n");
 
         al::PartsModel* partsModel = new al::PartsModel("髪");
